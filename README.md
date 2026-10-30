@@ -151,3 +151,5 @@ scripts/install.py         Standalone Python installer
 install.sh                 Shell entry point
 tests/test_install.py      Installer regression tests
 ```
+
+[linux.do](https://linux.do/u/sxhxliang)
