@@ -1,0 +1,3 @@
+interface:
+  display_name: "GPUI Liquid Glass"
+  short_description: "在 GPUI 中实现 Apple 原生 Liquid Glass 材质"
