@@ -8,11 +8,13 @@
 
 ## 效果展示
 
-Genius 的浅色和深色界面，展示玻璃侧栏与工具栏胶囊。
+以下截图展示了 **Genius Markdown 编辑器** 中 Liquid Glass 的实践效果，包括玻璃侧栏与工具栏胶囊。
 
 | 浅色界面 | 深色界面 |
 | --- | --- |
 | ![Genius 浅色界面中的 Liquid Glass 侧栏与工具栏](assets/image.png) | ![Genius 深色界面中的 Liquid Glass 侧栏与工具栏](assets/image2.png) |
+
+欢迎前往 [Genius 官网](https://gns.sh) 下载应用，体验实际效果。
 
 ## 覆盖内容
 
@@ -135,7 +137,7 @@ python3 -B -m unittest discover -s tests -v
 bash -n install.sh
 ```
 
-安装器测试使用临时目录和内存中的 GitHub ZIP 内容，覆盖 Codex 与 Claude Code 的安装位置、项目安装、更新、备份、失败恢复、自定义路径、环境变量、解压和错误处理。原生 API 示例已在 Rust 1.98.1、`objc2 0.6.5`、`objc2-app-kit 0.3.2` 下编译；该检查不能替代具体应用的视觉验证。
+安装器测试使用临时目录和内存中的 GitHub ZIP 内容，覆盖 Codex 与 Claude Code 的安装位置、项目安装、更新、备份、失败恢复、自定义路径、环境变量、解压、Python 缺少根证书时保留 HTTPS 验证的 `curl` 下载降级，以及错误处理。原生 API 示例已在 Rust 1.98.1、`objc2 0.6.5`、`objc2-app-kit 0.3.2` 下编译；该检查不能替代具体应用的视觉验证。
 
 ## 仓库内容
 

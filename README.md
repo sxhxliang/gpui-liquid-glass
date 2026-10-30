@@ -8,11 +8,13 @@ The package contains agent instructions and a native API example. The bundled sk
 
 ## Preview
 
-Genius in light and dark appearances, showing the glass sidebar and toolbar capsules.
+These screenshots show the Liquid Glass implementation in the **Genius Markdown editor**, including its glass sidebar and toolbar capsules.
 
 | Light appearance | Dark appearance |
 | --- | --- |
 | ![Genius with a Liquid Glass sidebar and toolbar in light appearance](assets/image.png) | ![Genius with a Liquid Glass sidebar and toolbar in dark appearance](assets/image2.png) |
+
+Visit the [official Genius website](https://gns.sh) to download the app and experience the effect in use.
 
 ## What it covers
 
@@ -137,7 +139,7 @@ python3 -B -m unittest discover -s tests -v
 bash -n install.sh
 ```
 
-The installer tests use temporary directories and in-memory GitHub archives. They cover Codex and Claude Code destinations, project installation, updates, backups, rollback, custom paths, environment overrides, archive extraction, and failure handling. The native API example was compiled with Rust 1.98.1, `objc2 0.6.5`, and `objc2-app-kit 0.3.2`; that check does not establish a particular app's rendered appearance.
+The installer tests use temporary directories and in-memory GitHub archives. They cover Codex and Claude Code destinations, project installation, updates, backups, rollback, custom paths, environment overrides, archive extraction, a verified `curl` fallback for missing Python certificate roots, and failure handling. The native API example was compiled with Rust 1.98.1, `objc2 0.6.5`, and `objc2-app-kit 0.3.2`; that check does not establish a particular app's rendered appearance.
 
 ## Contents
 
