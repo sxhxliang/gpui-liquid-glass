@@ -3,6 +3,7 @@ import importlib.util
 import io
 import os
 from pathlib import Path
+import ssl
 import stat
 import subprocess
 import sys
@@ -220,6 +221,57 @@ class InstallerTests(unittest.TestCase):
         self.assertNotEqual(status, 0)
         self.assertEqual(marker.read_text(), "keep")
         self.assertFalse((self.skills.parent / "skill-backups").exists())
+
+    def test_python_certificate_failure_can_use_verified_curl_for_both_agents(self):
+        project = self.directory / "GPUI project"
+        requests = []
+
+        def curl_response(command, **kwargs):
+            requests.append(command)
+            Path(command[command.index("-o") + 1]).write_bytes(self.archive_bytes())
+            return subprocess.CompletedProcess(command, 0, "", "")
+
+        certificate_error = URLError(ssl.SSLCertVerificationError("Missing Python certificate roots"))
+        with mock.patch.object(installer, "urlopen", side_effect=certificate_error):
+            with mock.patch.object(installer.shutil, "which", return_value="/usr/bin/curl"):
+                with mock.patch.object(installer.subprocess, "run", side_effect=curl_response):
+                    with contextlib.redirect_stdout(io.StringIO()):
+                        status = installer.main([
+                            "--repo", installer.DEFAULT_REPOSITORY, "--ref", "main",
+                            "--agent", "both", "--project", str(project),
+                        ])
+        self.assertEqual(status, 0)
+        self.assert_payload(project / ".agents" / "skills" / installer.SKILL_NAME)
+        self.assert_payload(project / ".claude" / "skills" / installer.SKILL_NAME)
+        self.assertEqual(len(requests), 1)
+        self.assertIn(f"https://codeload.github.com/{installer.DEFAULT_REPOSITORY}/zip/main", requests[0])
+        self.assertNotIn("-k", requests[0])
+        self.assertNotIn("--insecure", requests[0])
+
+    def test_failed_curl_fallback_preserves_the_existing_installation(self):
+        destination, _ = installer.install_skill(SOURCE, self.skills)
+        marker = destination / "local-customization.md"
+        marker.write_text("keep", encoding="utf-8")
+        certificate_error = URLError(ssl.SSLCertVerificationError("Missing Python certificate roots"))
+        with mock.patch.object(installer, "urlopen", side_effect=certificate_error):
+            with mock.patch.object(installer.shutil, "which", return_value="/usr/bin/curl"):
+                with mock.patch.object(installer.subprocess, "run", return_value=subprocess.CompletedProcess([], 60, "", "Certificate verification failed")):
+                    with contextlib.redirect_stderr(io.StringIO()):
+                        status = installer.main([
+                            "--ref", "main", "--force", "--skills-dir", str(self.skills),
+                        ])
+        self.assertNotEqual(status, 0)
+        self.assertEqual(marker.read_text(), "keep")
+        self.assertFalse((self.skills.parent / "skill-backups").exists())
+
+    def test_certificate_failure_without_curl_does_not_create_an_installation(self):
+        certificate_error = URLError(ssl.SSLCertVerificationError("Missing Python certificate roots"))
+        with mock.patch.object(installer, "urlopen", side_effect=certificate_error):
+            with mock.patch.object(installer.shutil, "which", return_value=None):
+                with contextlib.redirect_stderr(io.StringIO()):
+                    status = installer.main(["--ref", "main", "--skills-dir", str(self.skills)])
+        self.assertNotEqual(status, 0)
+        self.assertFalse(self.skills.exists())
 
     def test_archive_entries_cannot_escape_the_extraction_directory(self):
         archive = self.directory / "invalid.zip"

@@ -7,9 +7,12 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import shutil
+import ssl
 import stat
+import subprocess
 import sys
 import tempfile
+from urllib.error import URLError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 import zipfile
@@ -90,8 +93,27 @@ def download_skill(repository, ref, directory):
     archive_path = Path(directory) / "source.zip"
     url = f"https://codeload.github.com/{repository}/zip/{quote(ref, safe='')}"
     request = Request(url, headers={"User-Agent": "gpui-liquid-glass-installer"})
-    with urlopen(request, timeout=30) as response, archive_path.open("wb") as writer:
-        shutil.copyfileobj(response, writer)
+    try:
+        with urlopen(request, timeout=30) as response, archive_path.open("wb") as writer:
+            shutil.copyfileobj(response, writer)
+    except URLError as error:
+        # Some macOS Python installations lack the system certificate roots.
+        # curl uses its own trust store and still verifies HTTPS certificates.
+        if not isinstance(error.reason, ssl.SSLCertVerificationError):
+            raise
+        curl = shutil.which("curl")
+        if curl is None:
+            raise
+        result = subprocess.run(
+            [curl, "-fsSL", "--connect-timeout", "10", "--max-time", "60",
+             "--user-agent", "gpui-liquid-glass-installer", url, "-o", str(archive_path)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            detail = result.stderr.strip() or f"curl exited with status {result.returncode}"
+            raise OSError(f"GitHub download failed: {detail}") from error
     return extract_skill(archive_path, Path(directory) / "skill")
 
 
