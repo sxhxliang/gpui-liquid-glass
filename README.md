@@ -4,7 +4,11 @@
 
 A skill for **Codex and Claude Code** that implements, repairs, and analyzes Apple's native Liquid Glass in Rust GPUI and GPUI Kit desktop applications. It guides the agent through AppKit material selection, transparent window composition, layout synchronization, and older macOS fallbacks.
 
-The package contains agent instructions and a native API example. The bundled skill instructions are in Chinese; the usage examples are available in English and Chinese.
+The package contains agent instructions and a native API example. 
+
+> [!CAUTION]
+>- The bundled skill instructions are in Chinese; the usage examples are available in English and Chinese.
+>- skill 正文使用中文，使用示例提供中英文版本。[中文](examples/usage.zh-CN.md) [英文](examples/usage.md)
 
 ## Preview
 
@@ -151,5 +155,3 @@ scripts/install.py         Standalone Python installer
 install.sh                 Shell entry point
 tests/test_install.py      Installer regression tests
 ```
-
-[linux.do](https://linux.do/u/sxhxliang)
